@@ -1,22 +1,10 @@
-console.log("Phase 2: Bringing the cat to life!");
+console.log("Phase 3.1: Drawing the cat with code!");
 
 const canvas = document.getElementById('cat-canvas');
 const ctx = canvas.getContext('2d');
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
-// --- Asset Loading ---
-const catImage = new Image();
-catImage.src = 'assets/cat-sprite.png'; // We'll use the image you provided
-let isImageLoaded = false;
-catImage.onload = () => {
-    isImageLoaded = true;
-};
-catImage.onerror = () => {
-    console.error("Failed to load cat sprite. Using a placeholder.");
-};
-
 
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
@@ -38,9 +26,6 @@ canvas.addEventListener('mousedown', (e) => {
 });
 canvas.addEventListener('mouseup', () => {
     mouse.isDown = false;
-    if (cat.isBeingDragged) {
-        cat.isBeingDragged = false;
-    }
 });
 canvas.addEventListener('mousemove', (e) => {
     if (mouse.isDown) {
@@ -50,9 +35,6 @@ canvas.addEventListener('mousemove', (e) => {
 });
 canvas.addEventListener('mouseleave', () => {
     mouse.isDown = false;
-    if (cat.isBeingDragged) {
-        cat.isBeingDragged = false;
-    }
 });
 
 // Touch events
@@ -65,9 +47,6 @@ canvas.addEventListener('touchstart', (e) => {
 canvas.addEventListener('touchend', (e) => {
     e.preventDefault();
     mouse.isDown = false;
-    if (cat.isBeingDragged) {
-        cat.isBeingDragged = false;
-    }
 }, { passive: false });
 canvas.addEventListener('touchmove', (e) => {
     e.preventDefault();
@@ -84,10 +63,9 @@ const friction = 0.9;
 const walkSpeed = 1.5;
 
 class Cat {
-    constructor(image) {
-        this.image = image;
-        this.width = 80; // Approximate width from image
-        this.height = 60; // Approximate height
+    constructor() {
+        this.width = 50; 
+        this.height = 40;
         this.x = canvas.width / 2;
         this.y = canvas.height / 2;
         this.vx = (Math.random() - 0.5) * 4;
@@ -96,36 +74,93 @@ class Cat {
         this.isBeingDragged = false;
         this.state = 'falling'; // Initial state
         this.stateTimer = 0;
+        this.facing = 1; // 1 for right, -1 for left
     }
 
     draw() {
-// ...existing code...
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        
+        // Update facing direction based on velocity, but only if not being dragged
+        if (!this.isBeingDragged && this.vx !== 0) {
+            this.facing = this.vx > 0 ? 1 : -1;
+        }
+        ctx.scale(this.facing, 1);
+
+        const bodyWidth = 35;
+        const bodyHeight = 22;
+        const headRadius = 12;
+        const earHeight = 10;
+        const legHeight = 8;
+        const tailLength = 15;
+
+        // Legs (draw them first so they are behind the body)
+        ctx.fillStyle = '#222222'; // Darker gray for legs
+        ctx.fillRect(-bodyWidth / 2 + 4, bodyHeight / 2, 6, legHeight);
+        ctx.fillRect(bodyWidth / 2 - 10, bodyHeight / 2, 6, legHeight);
+
+        // Tail
+        ctx.strokeStyle = '#333333';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-bodyWidth / 2, 0);
+        ctx.quadraticCurveTo(-bodyWidth / 2 - tailLength, -10, -bodyWidth / 2 - tailLength, tailLength);
+        ctx.stroke();
+
+        // Body
+        ctx.fillStyle = '#333333'; // Main body color
+        ctx.fillRect(-bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight);
+
+        // Head
+        ctx.beginPath();
+        ctx.arc(0, -bodyHeight / 2 - headRadius / 2 + 2, headRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Ears
+        ctx.beginPath();
+        ctx.moveTo(-headRadius / 1.5, -bodyHeight / 2 - headRadius + 2);
+        ctx.lineTo(-headRadius / 3, -bodyHeight / 2 - headRadius - earHeight + 2);
+        ctx.lineTo(0, -bodyHeight / 2 - headRadius + 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(headRadius / 1.5, -bodyHeight / 2 - headRadius + 2);
+        ctx.lineTo(headRadius / 3, -bodyHeight / 2 - headRadius - earHeight + 2);
+        ctx.lineTo(0, -bodyHeight / 2 - headRadius + 2);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(-headRadius / 3, -bodyHeight / 2 - headRadius / 1.5 + 2, 2, 0, Math.PI * 2);
+        ctx.arc(headRadius / 3, -bodyHeight / 2 - headRadius / 1.5 + 2, 2, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
-    }
-    
-    drawPlaceholder() {
-// ...existing code...
-        ctx.fillRect(this.x - 10, this.y, 20, 20);
     }
 
     update() {
         this.checkDrag();
 
-        // State machine logic
-        switch (this.state) {
-            case 'falling':
-                this.updateFalling();
-                break;
-            case 'idle':
-                this.updateIdle();
-                break;
-            case 'walking':
-                this.updateWalking();
-                break;
-        }
-
-        // Common physics for all states (except dragged)
-        if (!this.isBeingDragged) {
+        if (this.isBeingDragged) {
+            this.x = mouse.x;
+            this.y = mouse.y;
+            this.vx = 0;
+            this.vy = 0;
+        } else {
+            // State machine logic
+            switch (this.state) {
+                case 'falling':
+                    this.updateFalling();
+                    break;
+                case 'idle':
+                    this.updateIdle();
+                    break;
+                case 'walking':
+                    this.updateWalking();
+                    break;
+            }
+            // Common physics for all non-dragged states
             this.vy += gravity;
             this.x += this.vx;
             this.y += this.vy;
@@ -167,7 +202,9 @@ class Cat {
         if (this.y + this.height / 2 > canvas.height) {
             this.y = canvas.height - this.height / 2;
             this.vy = 0; // Stop vertical movement on ground
-            this.vx *= friction;
+            if (this.state === 'falling') { // Only apply friction bounce on landing
+                 this.vx *= friction;
+            }
         }
 
         // Wall collision
@@ -187,44 +224,30 @@ class Cat {
             const distance = Math.sqrt(
                 (mouse.x - this.x) ** 2 + (mouse.y - this.y) ** 2
             );
-            if (distance < Math.max(this.width, this.height) / 2) {
+            if (distance < Math.max(this.width, this.height)) { // Increased hitbox
                 this.isBeingDragged = true;
                 this.state = 'dragged';
-                this.vx = 0;
-                this.vy = 0;
             }
-        }
-
-        // If being dragged, update position
-        if (this.isBeingDragged) {
-            this.x = mouse.x;
-            this.y = mouse.y;
         }
 
         // If mouse is released, stop dragging
         if (!mouse.isDown && this.isBeingDragged) {
             this.isBeingDragged = false;
             this.state = 'falling';
-            // Give it a little toss based on mouse movement
-            this.vx = (mouse.x - this.x) * 0.1; 
-            this.vy = (mouse.y - this.y) * 0.1;
+            // Give it a little toss based on recent mouse movement
+            this.vx = (this.x - (mouse.x - this.vx)) * 0.1; 
+            this.vy = (this.y - (mouse.y - this.vy)) * 0.1;
         }
     }
 }
 
-const cat = new Cat(catImage);
-
+const cat = new Cat();
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     cat.update();
-
-    if (isImageLoaded) {
-        cat.draw();
-    } else {
-        cat.drawPlaceholder();
-    }
+    cat.draw();
 
     requestAnimationFrame(animate);
 }
