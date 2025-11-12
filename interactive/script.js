@@ -81,6 +81,7 @@ canvas.addEventListener('touchmove', (e) => {
 // --- Physics & Cat Logic ---
 const gravity = 0.4;
 const friction = 0.9;
+const walkSpeed = 1.5;
 
 class Cat {
     constructor(image) {
@@ -91,75 +92,128 @@ class Cat {
         this.y = canvas.height / 2;
         this.vx = (Math.random() - 0.5) * 4;
         this.vy = (Math.random() - 0.5) * 4;
+        
         this.isBeingDragged = false;
+        this.state = 'falling'; // Initial state
+        this.stateTimer = 0;
     }
 
     draw() {
-        ctx.save();
-        // Flip sprite if moving left
-        if (this.vx < 0) {
-            ctx.scale(-1, 1);
-            ctx.drawImage(this.image, -this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        } else {
-            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        }
+// ...existing code...
         ctx.restore();
     }
     
     drawPlaceholder() {
-        ctx.fillStyle = '#fd9a44';
-        ctx.fillRect(this.x - 20, this.y - 20, 40, 40);
-        ctx.fillStyle = '#ffffff';
+// ...existing code...
         ctx.fillRect(this.x - 10, this.y, 20, 20);
     }
 
     update() {
         this.checkDrag();
 
-        if (this.isBeingDragged) {
-            // Track mouse/touch position
-            this.vx = (mouse.x - this.x) * 0.3;
-            this.vy = (mouse.y - this.y) * 0.3;
-            this.x = mouse.x;
-            this.y = mouse.y;
-        } else {
-            // Apply gravity
+        // State machine logic
+        switch (this.state) {
+            case 'falling':
+                this.updateFalling();
+                break;
+            case 'idle':
+                this.updateIdle();
+                break;
+            case 'walking':
+                this.updateWalking();
+                break;
+        }
+
+        // Common physics for all states (except dragged)
+        if (!this.isBeingDragged) {
             this.vy += gravity;
             this.x += this.vx;
             this.y += this.vy;
         }
 
+        // Common collision detection
+        this.handleCollisions();
+    }
+
+    updateFalling() {
+        // State transition: land on the floor
+        if (this.y + this.height / 2 >= canvas.height) {
+            this.state = 'idle';
+            this.stateTimer = Math.random() * 120 + 60; // Idle for 1-3 seconds
+            this.vx = 0;
+        }
+    }
+
+    updateIdle() {
+        this.stateTimer--;
+        if (this.stateTimer <= 0) {
+            this.state = 'walking';
+            this.vx = (Math.random() < 0.5 ? -1 : 1) * walkSpeed;
+            this.stateTimer = Math.random() * 180 + 120; // Walk for 2-5 seconds
+        }
+    }
+
+    updateWalking() {
+        this.stateTimer--;
+        if (this.stateTimer <= 0) {
+            this.state = 'idle';
+            this.vx = 0;
+            this.stateTimer = Math.random() * 120 + 60; // Idle for 1-3 seconds
+        }
+    }
+
+    handleCollisions() {
         // Floor collision
         if (this.y + this.height / 2 > canvas.height) {
             this.y = canvas.height - this.height / 2;
-            this.vy *= -0.6; // Bounce
+            this.vy = 0; // Stop vertical movement on ground
             this.vx *= friction;
         }
 
         // Wall collision
         if (this.x + this.width / 2 > canvas.width) {
             this.x = canvas.width - this.width / 2;
-            this.vx *= -1;
+            this.vx *= -1; // Turn around
         }
         if (this.x - this.width / 2 < 0) {
             this.x = this.width / 2;
-            this.vx *= -1;
+            this.vx *= -1; // Turn around
         }
     }
 
     checkDrag() {
+        // Check if mouse is pressed and over the cat
         if (mouse.isDown && !this.isBeingDragged) {
             const distance = Math.sqrt(
                 (mouse.x - this.x) ** 2 + (mouse.y - this.y) ** 2
             );
             if (distance < Math.max(this.width, this.height) / 2) {
                 this.isBeingDragged = true;
+                this.state = 'dragged';
+                this.vx = 0;
+                this.vy = 0;
             }
+        }
+
+        // If being dragged, update position
+        if (this.isBeingDragged) {
+            this.x = mouse.x;
+            this.y = mouse.y;
+        }
+
+        // If mouse is released, stop dragging
+        if (!mouse.isDown && this.isBeingDragged) {
+            this.isBeingDragged = false;
+            this.state = 'falling';
+            // Give it a little toss based on mouse movement
+            this.vx = (mouse.x - this.x) * 0.1; 
+            this.vy = (mouse.y - this.y) * 0.1;
         }
     }
 }
 
 const cat = new Cat(catImage);
+
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
