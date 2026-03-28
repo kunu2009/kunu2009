@@ -1,3 +1,5 @@
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/03bd77d5-689c-476c-8b78-73bbd44627c7" />
+
 <div align="center">
 
 # Hi there, I'm Kunal (kunu2009) 👋
