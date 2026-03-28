@@ -49,7 +49,16 @@ function updatePointer(x, y) {
     pointer.y = y;
 }
 
-canvas.addEventListener('mousedown', (event) => {
+const interactiveSelector = 'a, button, input, textarea, select, summary, label';
+
+function shouldIgnorePointerStart(target) {
+    return target instanceof Element && Boolean(target.closest(interactiveSelector));
+}
+
+window.addEventListener('mousedown', (event) => {
+    if (shouldIgnorePointerStart(event.target)) {
+        return;
+    }
     pointer.isDown = true;
     pointer.justPressed = true;
     updatePointer(event.clientX, event.clientY);
@@ -63,19 +72,24 @@ window.addEventListener('mouseup', () => {
     pointer.isDown = false;
 });
 
-canvas.addEventListener('touchstart', (event) => {
-    event.preventDefault();
+window.addEventListener('touchstart', (event) => {
+    if (!event.touches[0] || shouldIgnorePointerStart(event.target)) {
+        return;
+    }
     pointer.isDown = true;
     pointer.justPressed = true;
     updatePointer(event.touches[0].clientX, event.touches[0].clientY);
-}, { passive: false });
+}, { passive: true });
 
 window.addEventListener('touchmove', (event) => {
     if (!event.touches[0]) {
         return;
     }
+    if (pointer.isDown) {
+        event.preventDefault();
+    }
     updatePointer(event.touches[0].clientX, event.touches[0].clientY);
-}, { passive: true });
+}, { passive: false });
 
 window.addEventListener('touchend', () => {
     pointer.isDown = false;
@@ -410,12 +424,28 @@ class Cat {
         const sleepBob = this.state === 'sleeping' ? Math.sin(this.sleepWave) * 1.4 : 0;
         const bob = Math.sin(this.breath) * 1.5 + sleepBob;
         const floorShadow = 12 + Math.min(Math.abs(this.vy), 8) * 1.35;
+        const palette = {
+            legs: '#5f86ea',
+            body: '#86abff',
+            tail: '#739bff',
+            outline: '#183067',
+            eye: '#f5f9ff',
+            pupil: '#2d4f9f',
+        };
 
         ctx.save();
         ctx.globalAlpha = 0.28;
         ctx.fillStyle = '#000';
         ctx.beginPath();
         ctx.ellipse(this.x, this.floorY() + this.height * 0.48, this.width * 0.44, floorShadow * 0.43, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.globalAlpha = 0.17;
+        ctx.fillStyle = '#9fc2ff';
+        ctx.beginPath();
+        ctx.ellipse(this.x, this.y - 8 + bob, 36, 24, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
@@ -439,11 +469,11 @@ class Cat {
             ctx.restore();
         }
 
-        ctx.fillStyle = '#1f2744';
+        ctx.fillStyle = palette.legs;
         ctx.fillRect(-bodyWidth / 2 + 5, bodyHeight / 2, 7, legHeight + step);
         ctx.fillRect(bodyWidth / 2 - 12, bodyHeight / 2, 7, legHeight - step);
 
-        ctx.strokeStyle = '#25315f';
+        ctx.strokeStyle = palette.tail;
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -451,12 +481,17 @@ class Cat {
         ctx.quadraticCurveTo(-bodyWidth / 2 - 18, -8 + Math.sin(this.tailWave) * 2.8, -bodyWidth / 2 - 13, 16);
         ctx.stroke();
 
-        ctx.fillStyle = '#26335f';
+        ctx.fillStyle = palette.body;
         ctx.fillRect(-bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight);
+
+        ctx.strokeStyle = palette.outline;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight);
 
         ctx.beginPath();
         ctx.arc(0, -bodyHeight / 2 - headRadius / 2 + 1.4, headRadius, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
         ctx.beginPath();
         ctx.moveTo(-8, -bodyHeight / 2 - headRadius + 3);
@@ -473,9 +508,15 @@ class Cat {
         const eyeY = -bodyHeight / 2 - headRadius / 1.5 + 2.4;
         const eyelid = this.state === 'sleeping' ? 2.6 : Math.min(this.blinkProgress * 5, 5);
 
-        ctx.fillStyle = '#e9f2ff';
+        ctx.fillStyle = palette.eye;
         ctx.fillRect(-5.8, eyeY, 3.2, Math.max(0.8, 3 - eyelid));
         ctx.fillRect(2.6, eyeY, 3.2, Math.max(0.8, 3 - eyelid));
+
+        if (this.state !== 'sleeping') {
+            ctx.fillStyle = palette.pupil;
+            ctx.fillRect(-4.7, eyeY + 0.7, 1.1, 1.1);
+            ctx.fillRect(3.7, eyeY + 0.7, 1.1, 1.1);
+        }
 
         ctx.strokeStyle = '#d4e6ff';
         ctx.lineWidth = 1.4;

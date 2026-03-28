@@ -2,88 +2,88 @@
 
 <img width="1536" height="1024" alt="7K banner" src="https://github.com/user-attachments/assets/03bd77d5-689c-476c-8b78-73bbd44627c7" />
 
-# Kunal Chheda ([@kunu2009](https://github.com/kunu2009)) 👋
+# Hey, I'm Kunal ([@kunu2009](https://github.com/kunu2009)) 👋
 
-### I build high-impact digital products for students, creators, and ambitious brands.
+### Founder of the **7K Ecosystem** — I design and build product experiences people actually enjoy using.
 
 <p>
-Founder of the <b>7K Ecosystem</b> · Product-minded developer · Design + code execution in one flow.
+  Student developer from India · shipping real products for productivity, education, and creators.
 </p>
 
 <p>
   <a href="https://www.7kc.me"><img src="https://img.shields.io/badge/🌐%20Portfolio-Visit%20Now-7b61ff?style=for-the-badge" alt="Portfolio"/></a>
   <a href="https://www.7kc.me/apps"><img src="https://img.shields.io/badge/🧩%20Apps-33%2B-00c2ff?style=for-the-badge" alt="Apps"/></a>
-  <a href="mailto:7kmindbeatss@gmail.com"><img src="https://img.shields.io/badge/📩%20Hire%20Me-Open%20to%20Projects-00f5d4?style=for-the-badge&logoColor=111" alt="Hire Me"/></a>
+  <a href="mailto:7kmindbeatss@gmail.com"><img src="https://img.shields.io/badge/🤝%20Collaborations-Open-00f5d4?style=for-the-badge&logoColor=111" alt="Collaborations"/></a>
 </p>
 
 </div>
 
 ---
 
-## 🚀 Quick links
+## 🚀 Start here
 
 <div align="center">
-  <a href="https://www.7kc.me"><img src="https://img.shields.io/badge/Main%20Site-7kc.me-111827?style=for-the-badge" alt="Main Site"/></a>
-  <a href="https://www.7kc.me/portfolio"><img src="https://img.shields.io/badge/Portfolio%20Modes-14%20Experiences-111827?style=for-the-badge" alt="Portfolio Modes"/></a>
-  <a href="https://www.7kc.me/apps"><img src="https://img.shields.io/badge/7K%20App%20Store-Explore-111827?style=for-the-badge" alt="App Store"/></a>
-  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html"><img src="https://img.shields.io/badge/Interactive%20Cat-Live%20Demo-111827?style=for-the-badge" alt="Interactive Cat"/></a>
+  <a href="https://www.7kc.me"><img src="https://img.shields.io/badge/Main%20Website-7kc.me-111827?style=for-the-badge" alt="Main website"/></a>
+  <a href="https://www.7kc.me/apps"><img src="https://img.shields.io/badge/7K%20Apps-Explore-111827?style=for-the-badge" alt="Apps"/></a>
+  <a href="https://www.7kc.me/portfolio"><img src="https://img.shields.io/badge/Portfolio-14%20Modes-111827?style=for-the-badge" alt="Portfolio"/></a>
+  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html"><img src="https://img.shields.io/badge/Interactive%20Cat-Live%20Playground-111827?style=for-the-badge" alt="Interactive cat"/></a>
 </div>
 
 ---
 
-## 🧭 What I build
+## 🧭 What I build best
 
-- **Landing pages** that convert visitors into inquiries.
-- **Web app MVPs** that validate ideas quickly.
-- **Product experiences** with polished UI and engaging interaction.
+- ⚡ **Landing pages** focused on first impression + conversions.
+- 🧩 **MVP web apps** built quickly for validation and launch.
+- 🎨 **UI/UX refreshes** that improve trust, clarity, and engagement.
 
-### Snapshot
+### 7K Snapshot
 
 | Area | Current |
 |---|---|
 | Apps built | **33+** |
 | Portfolio experiences | **14** |
-| Focus | Productivity · Education · Finance · Creative Tools |
-| Availability | **Open for collaborations** |
+| Focus | Productivity · Education · Finance · Creator Tools |
+| Status | **Open to collaborations** |
 
 ---
 
-## 🐾 Interactive Cat Zone (README-friendly)
+## 🐾 Interactive Cat Zone
 
 GitHub README files do **not** allow JavaScript execution, so full on-page drag/pet physics cannot run directly inside `README.md`.
 
-What works great:
-- Keep a **live interactive demo link**
-- Add **quick action links** that open the cat in different modes
-- Use `<details>` blocks for lightweight interactive UX in README itself
+So here’s the best setup:
+- launch a **live interactive page** from README,
+- preload different moods via URL hash,
+- keep this section as the quick control hub.
 
 <div align="center">
-  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html#play"><img src="https://img.shields.io/badge/🎾%20Throw%20Toy-Play%20Mode-7b61ff?style=for-the-badge" alt="Play Mode"/></a>
-  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html#pet"><img src="https://img.shields.io/badge/💖%20Pet%20Cat-Friendly%20Mode-00c2ff?style=for-the-badge" alt="Pet Mode"/></a>
-  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html#sleep"><img src="https://img.shields.io/badge/🌙%20Nap%20Time-Chill%20Mode-00f5d4?style=for-the-badge&logoColor=111" alt="Sleep Mode"/></a>
+  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html#play"><img src="https://img.shields.io/badge/🎾%20Play%20Mode-Throw%20Toy-7b61ff?style=for-the-badge" alt="Play mode"/></a>
+  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html#pet"><img src="https://img.shields.io/badge/💖%20Pet%20Mode-Make%20Cat%20Happy-00c2ff?style=for-the-badge" alt="Pet mode"/></a>
+  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html#sleep"><img src="https://img.shields.io/badge/🌙%20Nap%20Mode-Chill%20Cat-00f5d4?style=for-the-badge&logoColor=111" alt="Nap mode"/></a>
 </div>
 
 <details>
-  <summary><b>How to interact with the cat</b></summary>
+  <summary><b>How to use it</b></summary>
 
 1. Open the live demo from any button above.
 2. Drag the cat with mouse/touch.
-3. Use on-screen controls: <b>Throw toy</b>, <b>Pet cat</b>, <b>Nap mode</b>.
-4. Watch mood/status updates as the cat reacts.
+3. Use in-page controls to throw toy / pet / nap / reset.
+4. Watch mood status updates and particle reactions.
 
 </details>
 
 ---
 
-## 🧪 Featured products
+## 🧪 Featured products from 7K
 
-- **[7K Life](https://life.7kc.me/)** — productivity companion (habits, goals, tasks, journaling).
-- **[7K Polyglot](https://polyglot.7kc.me/)** — comparative language learning + AI speaking practice.
-- **[7K Law Prep](https://7klawprep.me/)** — CLAT/AILET/LSAT prep platform.
+- **[7K Life](https://life.7kc.me/)** — productivity system for habits, goals, tasks, and journaling.
+- **[7K Polyglot](https://polyglot.7kc.me/)** — AI-powered comparative language practice.
+- **[7K Law Prep](https://7klawprep.me/)** — full prep platform for CLAT/AILET/LSAT.
 
 ---
 
-## 🛠️ Stack
+## 🛠️ Core stack
 
 <div align="center">
 
