@@ -1,255 +1,378 @@
-console.log("Phase 3.1: Drawing the cat with code!");
-
 const canvas = document.getElementById('cat-canvas');
 const ctx = canvas.getContext('2d');
+const tip = document.querySelector('.cat-tip');
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+let viewWidth = window.innerWidth;
+let viewHeight = window.innerHeight;
 
-window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-});
+function resizeCanvas() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    viewWidth = window.innerWidth;
+    viewHeight = window.innerHeight;
 
-// --- Interaction ---
-const mouse = {
-    x: 0,
-    y: 0,
+    canvas.width = Math.floor(viewWidth * ratio);
+    canvas.height = Math.floor(viewHeight * ratio);
+    canvas.style.width = `${viewWidth}px`;
+    canvas.style.height = `${viewHeight}px`;
+
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const pointer = {
+    x: viewWidth * 0.5,
+    y: viewHeight * 0.5,
+    vx: 0,
+    vy: 0,
     isDown: false,
+    justPressed: false,
 };
 
-// Mouse events
-canvas.addEventListener('mousedown', (e) => {
-    mouse.isDown = true;
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
+function updatePointer(x, y) {
+    pointer.vx = x - pointer.x;
+    pointer.vy = y - pointer.y;
+    pointer.x = x;
+    pointer.y = y;
+}
+
+canvas.addEventListener('mousedown', (event) => {
+    pointer.isDown = true;
+    pointer.justPressed = true;
+    updatePointer(event.clientX, event.clientY);
 });
-canvas.addEventListener('mouseup', () => {
-    mouse.isDown = false;
+
+window.addEventListener('mouseup', () => {
+    pointer.isDown = false;
 });
-canvas.addEventListener('mousemove', (e) => {
-    if (mouse.isDown) {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
+
+window.addEventListener('mousemove', (event) => {
+    updatePointer(event.clientX, event.clientY);
+});
+
+canvas.addEventListener('touchstart', (event) => {
+    event.preventDefault();
+    pointer.isDown = true;
+    pointer.justPressed = true;
+    updatePointer(event.touches[0].clientX, event.touches[0].clientY);
+}, { passive: false });
+
+window.addEventListener('touchend', () => {
+    pointer.isDown = false;
+});
+
+window.addEventListener('touchmove', (event) => {
+    if (!event.touches[0]) {
+        return;
     }
-});
-canvas.addEventListener('mouseleave', () => {
-    mouse.isDown = false;
-});
+    updatePointer(event.touches[0].clientX, event.touches[0].clientY);
+}, { passive: true });
 
-// Touch events
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    mouse.isDown = true;
-    mouse.x = e.touches[0].clientX;
-    mouse.y = e.touches[0].clientY;
-}, { passive: false });
-canvas.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    mouse.isDown = false;
-}, { passive: false });
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    if (mouse.isDown) {
-        mouse.x = e.touches[0].clientX;
-        mouse.y = e.touches[0].clientY;
+class Spark {
+    constructor(x, y, color = 'rgba(170, 207, 255, 0.95)') {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 2.8;
+        this.vy = (Math.random() - 0.8) * 2.4;
+        this.life = Math.random() * 28 + 22;
+        this.size = Math.random() * 2 + 1;
+        this.color = color;
     }
-}, { passive: false });
 
-
-// --- Physics & Cat Logic ---
-const gravity = 0.4;
-const friction = 0.9;
-const walkSpeed = 1.5;
-
-class Cat {
-    constructor() {
-        this.width = 50; 
-        this.height = 40;
-        this.x = canvas.width / 2;
-        this.y = canvas.height / 2;
-        this.vx = (Math.random() - 0.5) * 4;
-        this.vy = (Math.random() - 0.5) * 4;
-        
-        this.isBeingDragged = false;
-        this.state = 'falling'; // Initial state
-        this.stateTimer = 0;
-        this.facing = 1; // 1 for right, -1 for left
+    update(delta) {
+        this.life -= delta;
+        this.vy += 0.07 * delta;
+        this.x += this.vx * delta;
+        this.y += this.vy * delta;
+        return this.life > 0;
     }
 
     draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        
-        // Update facing direction based on velocity, but only if not being dragged
-        if (!this.isBeingDragged && this.vx !== 0) {
-            this.facing = this.vx > 0 ? 1 : -1;
-        }
-        ctx.scale(this.facing, 1);
-
-        const bodyWidth = 35;
-        const bodyHeight = 22;
-        const headRadius = 12;
-        const earHeight = 10;
-        const legHeight = 8;
-        const tailLength = 15;
-
-        // Legs (draw them first so they are behind the body)
-        ctx.fillStyle = '#222222'; // Darker gray for legs
-        ctx.fillRect(-bodyWidth / 2 + 4, bodyHeight / 2, 6, legHeight);
-        ctx.fillRect(bodyWidth / 2 - 10, bodyHeight / 2, 6, legHeight);
-
-        // Tail
-        ctx.strokeStyle = '#333333';
-        ctx.lineWidth = 4;
+        const alpha = Math.max(this.life / 50, 0);
+        ctx.fillStyle = this.color.replace('0.95', alpha.toFixed(3));
         ctx.beginPath();
-        ctx.moveTo(-bodyWidth / 2, 0);
-        ctx.quadraticCurveTo(-bodyWidth / 2 - tailLength, -10, -bodyWidth / 2 - tailLength, tailLength);
-        ctx.stroke();
-
-        // Body
-        ctx.fillStyle = '#333333'; // Main body color
-        ctx.fillRect(-bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight);
-
-        // Head
-        ctx.beginPath();
-        ctx.arc(0, -bodyHeight / 2 - headRadius / 2 + 2, headRadius, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
+    }
+}
 
-        // Ears
-        ctx.beginPath();
-        ctx.moveTo(-headRadius / 1.5, -bodyHeight / 2 - headRadius + 2);
-        ctx.lineTo(-headRadius / 3, -bodyHeight / 2 - headRadius - earHeight + 2);
-        ctx.lineTo(0, -bodyHeight / 2 - headRadius + 2);
-        ctx.fill();
+class Cat {
+    constructor() {
+        this.width = 58;
+        this.height = 46;
+        this.x = viewWidth * 0.5;
+        this.y = viewHeight * 0.26;
+        this.vx = (Math.random() - 0.5) * 3;
+        this.vy = 0;
 
-        ctx.beginPath();
-        ctx.moveTo(headRadius / 1.5, -bodyHeight / 2 - headRadius + 2);
-        ctx.lineTo(headRadius / 3, -bodyHeight / 2 - headRadius - earHeight + 2);
-        ctx.lineTo(0, -bodyHeight / 2 - headRadius + 2);
-        ctx.fill();
+        this.state = 'falling';
+        this.stateTimer = 0;
+        this.walkTarget = this.x;
+        this.facing = 1;
+        this.dragOffsetX = 0;
+        this.dragOffsetY = 0;
+        this.isBeingDragged = false;
 
-        // Eyes
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(-headRadius / 3, -bodyHeight / 2 - headRadius / 1.5 + 2, 2, 0, Math.PI * 2);
-        ctx.arc(headRadius / 3, -bodyHeight / 2 - headRadius / 1.5 + 2, 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
+        this.blinkTimer = 90;
+        this.blinkProgress = 0;
+        this.breath = 0;
+        this.tailWave = 0;
     }
 
-    update() {
-        this.checkDrag();
+    floorY() {
+        return viewHeight - this.height * 0.5;
+    }
+
+    startIdle() {
+        this.state = 'idle';
+        this.stateTimer = Math.random() * 130 + 70;
+        this.vx *= 0.2;
+    }
+
+    startWalk() {
+        this.state = 'walking';
+        this.stateTimer = Math.random() * 220 + 120;
+        this.walkTarget = Math.random() * (viewWidth - 160) + 80;
+    }
+
+    emitSparks(list, amount, color) {
+        for (let i = 0; i < amount; i += 1) {
+            list.push(new Spark(this.x, this.y - this.height * 0.1, color));
+        }
+    }
+
+    checkDrag(sparks) {
+        if (pointer.justPressed && !this.isBeingDragged) {
+            const dx = pointer.x - this.x;
+            const dy = pointer.y - this.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < this.width * 0.9) {
+                this.isBeingDragged = true;
+                this.state = 'dragged';
+                this.dragOffsetX = this.x - pointer.x;
+                this.dragOffsetY = this.y - pointer.y;
+                this.emitSparks(sparks, 6, 'rgba(177, 224, 255, 0.95)');
+            }
+        }
+
+        if (this.isBeingDragged && !pointer.isDown) {
+            this.isBeingDragged = false;
+            this.state = 'falling';
+            this.vx = pointer.vx * 0.65;
+            this.vy = pointer.vy * 0.2 - 1.6;
+            this.emitSparks(sparks, 10, 'rgba(156, 193, 255, 0.95)');
+        }
+    }
+
+    updateState(delta) {
+        if (this.state === 'idle') {
+            this.stateTimer -= delta;
+            this.vx *= 0.92;
+            if (this.stateTimer <= 0) {
+                this.startWalk();
+            }
+            return;
+        }
+
+        if (this.state === 'walking') {
+            this.stateTimer -= delta;
+            const direction = Math.sign(this.walkTarget - this.x) || 1;
+            const speed = 1.25;
+            this.vx += (direction * speed - this.vx) * 0.07 * delta;
+
+            if (Math.abs(this.walkTarget - this.x) < 8 || this.stateTimer <= 0) {
+                this.startIdle();
+            }
+        }
+    }
+
+    handleCollisions(sparks) {
+        const floor = this.floorY();
+
+        if (this.y > floor) {
+            const impact = Math.abs(this.vy);
+            this.y = floor;
+            this.vy = 0;
+
+            if (this.state === 'falling') {
+                this.startIdle();
+                if (impact > 1.4) {
+                    this.emitSparks(sparks, 8, 'rgba(121, 174, 255, 0.95)');
+                }
+            }
+        }
+
+        if (this.x > viewWidth - this.width * 0.5) {
+            this.x = viewWidth - this.width * 0.5;
+            this.walkTarget = Math.max(80, this.x - 180);
+            this.vx *= -0.6;
+        }
+
+        if (this.x < this.width * 0.5) {
+            this.x = this.width * 0.5;
+            this.walkTarget = Math.min(viewWidth - 80, this.x + 180);
+            this.vx *= -0.6;
+        }
+    }
+
+    update(delta, sparks) {
+        this.checkDrag(sparks);
+        this.breath += 0.08 * delta;
+        this.tailWave += (this.state === 'walking' ? 0.2 : 0.07) * delta;
+
+        this.blinkTimer -= delta;
+        if (this.blinkTimer <= 0) {
+            this.blinkProgress = 1;
+            this.blinkTimer = Math.random() * 180 + 100;
+        }
+        this.blinkProgress = Math.max(0, this.blinkProgress - 0.16 * delta);
 
         if (this.isBeingDragged) {
-            this.x = mouse.x;
-            this.y = mouse.y;
+            this.x = pointer.x + this.dragOffsetX;
+            this.y = pointer.y + this.dragOffsetY;
             this.vx = 0;
             this.vy = 0;
         } else {
-            // State machine logic
-            switch (this.state) {
-                case 'falling':
-                    this.updateFalling();
-                    break;
-                case 'idle':
-                    this.updateIdle();
-                    break;
-                case 'walking':
-                    this.updateWalking();
-                    break;
+            this.updateState(delta);
+
+            if (this.state === 'falling') {
+                this.vy += 0.26 * delta;
+            } else {
+                this.vy += 0.08 * delta;
             }
-            // Common physics for all non-dragged states
-            this.vy += gravity;
-            this.x += this.vx;
-            this.y += this.vy;
+
+            this.x += this.vx * delta;
+            this.y += this.vy * delta;
         }
 
-        // Common collision detection
-        this.handleCollisions();
-    }
+        this.handleCollisions(sparks);
 
-    updateFalling() {
-        // State transition: land on the floor
-        if (this.y + this.height / 2 >= canvas.height) {
-            this.state = 'idle';
-            this.stateTimer = Math.random() * 120 + 60; // Idle for 1-3 seconds
-            this.vx = 0;
+        if (Math.abs(this.vx) > 0.2) {
+            this.facing = this.vx > 0 ? 1 : -1;
         }
     }
 
-    updateIdle() {
-        this.stateTimer--;
-        if (this.stateTimer <= 0) {
-            this.state = 'walking';
-            this.vx = (Math.random() < 0.5 ? -1 : 1) * walkSpeed;
-            this.stateTimer = Math.random() * 180 + 120; // Walk for 2-5 seconds
-        }
-    }
+    draw() {
+        const bob = Math.sin(this.breath) * 1.6;
+        const floorShadow = 12 + Math.min(Math.abs(this.vy), 8) * 1.4;
 
-    updateWalking() {
-        this.stateTimer--;
-        if (this.stateTimer <= 0) {
-            this.state = 'idle';
-            this.vx = 0;
-            this.stateTimer = Math.random() * 120 + 60; // Idle for 1-3 seconds
-        }
-    }
+        ctx.save();
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.ellipse(this.x, this.floorY() + this.height * 0.48, this.width * 0.42, floorShadow * 0.42, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
 
-    handleCollisions() {
-        // Floor collision
-        if (this.y + this.height / 2 > canvas.height) {
-            this.y = canvas.height - this.height / 2;
-            this.vy = 0; // Stop vertical movement on ground
-            if (this.state === 'falling') { // Only apply friction bounce on landing
-                 this.vx *= friction;
-            }
-        }
+        ctx.save();
+        ctx.translate(this.x, this.y + bob);
+        ctx.scale(this.facing, 1);
 
-        // Wall collision
-        if (this.x + this.width / 2 > canvas.width) {
-            this.x = canvas.width - this.width / 2;
-            this.vx *= -1; // Turn around
-        }
-        if (this.x - this.width / 2 < 0) {
-            this.x = this.width / 2;
-            this.vx *= -1; // Turn around
-        }
-    }
+        const bodyWidth = 38;
+        const bodyHeight = 24;
+        const headRadius = 13;
+        const legHeight = 8;
 
-    checkDrag() {
-        // Check if mouse is pressed and over the cat
-        if (mouse.isDown && !this.isBeingDragged) {
-            const distance = Math.sqrt(
-                (mouse.x - this.x) ** 2 + (mouse.y - this.y) ** 2
-            );
-            if (distance < Math.max(this.width, this.height)) { // Increased hitbox
-                this.isBeingDragged = true;
-                this.state = 'dragged';
-            }
-        }
+        const step = Math.sin(this.tailWave) * 1.7;
 
-        // If mouse is released, stop dragging
-        if (!mouse.isDown && this.isBeingDragged) {
-            this.isBeingDragged = false;
-            this.state = 'falling';
-            // Give it a little toss based on recent mouse movement
-            this.vx = (this.x - (mouse.x - this.vx)) * 0.1; 
-            this.vy = (this.y - (mouse.y - this.vy)) * 0.1;
-        }
+        ctx.fillStyle = '#1f2744';
+        ctx.fillRect(-bodyWidth / 2 + 5, bodyHeight / 2, 7, legHeight + step);
+        ctx.fillRect(bodyWidth / 2 - 12, bodyHeight / 2, 7, legHeight - step);
+
+        ctx.strokeStyle = '#25315f';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-bodyWidth / 2 + 1, -3);
+        ctx.quadraticCurveTo(-bodyWidth / 2 - 18, -8 + Math.sin(this.tailWave) * 3, -bodyWidth / 2 - 14, 16);
+        ctx.stroke();
+
+        ctx.fillStyle = '#26335f';
+        ctx.fillRect(-bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight);
+
+        ctx.beginPath();
+        ctx.arc(0, -bodyHeight / 2 - headRadius / 2 + 1, headRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(-8, -bodyHeight / 2 - headRadius + 2);
+        ctx.lineTo(-2, -bodyHeight / 2 - headRadius - 9);
+        ctx.lineTo(2, -bodyHeight / 2 - headRadius + 1);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(8, -bodyHeight / 2 - headRadius + 2);
+        ctx.lineTo(2, -bodyHeight / 2 - headRadius - 9);
+        ctx.lineTo(-2, -bodyHeight / 2 - headRadius + 1);
+        ctx.fill();
+
+        const eyeY = -bodyHeight / 2 - headRadius / 1.55 + 2;
+        const eyelid = Math.min(this.blinkProgress * 5, 5);
+        ctx.fillStyle = '#e9f2ff';
+        ctx.fillRect(-5.8, eyeY, 3.2, Math.max(0.8, 3 - eyelid));
+        ctx.fillRect(2.6, eyeY, 3.2, Math.max(0.8, 3 - eyelid));
+
+        ctx.strokeStyle = '#d4e6ff';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(-2, eyeY + 7.2);
+        ctx.quadraticCurveTo(0, eyeY + 9, 2, eyeY + 7.2);
+        ctx.stroke();
+
+        ctx.restore();
     }
 }
 
+const sparks = [];
 const cat = new Cat();
 
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    cat.update();
+const tipMessages = [
+    '🐾 Drag the cat around. A playful brand moment = memorable first impression.',
+    '✨ Small interactions build trust faster than plain pages.',
+    '🚀 Want this quality for your brand? Use “Start your project”.'
+];
+
+let tipIndex = 0;
+let tipTimer = 0;
+
+function updateTip(delta) {
+    if (!tip) {
+        return;
+    }
+
+    tipTimer += delta;
+    if (tipTimer > 380) {
+        tipTimer = 0;
+        tipIndex = (tipIndex + 1) % tipMessages.length;
+        tip.textContent = tipMessages[tipIndex];
+    }
+}
+
+let lastTime = performance.now();
+
+function animate(now) {
+    const delta = Math.min((now - lastTime) / 16.6667, 2);
+    lastTime = now;
+
+    ctx.clearRect(0, 0, viewWidth, viewHeight);
+
+    cat.update(delta, sparks);
     cat.draw();
 
+    for (let i = sparks.length - 1; i >= 0; i -= 1) {
+        if (!sparks[i].update(delta)) {
+            sparks.splice(i, 1);
+            continue;
+        }
+        sparks[i].draw();
+    }
+
+    updateTip(delta);
+
+    pointer.justPressed = false;
     requestAnimationFrame(animate);
 }
 
-animate();
+requestAnimationFrame(animate);
