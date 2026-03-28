@@ -32,7 +32,7 @@ I build apps that solve real-world problems for students, creators, and everyday
   <a href="https://www.7kc.me"><img src="https://img.shields.io/badge/🌐%20Main%20Portfolio-Visit%20Now-111827?style=for-the-badge" alt="Main Portfolio"/></a>
   <a href="https://www.7kc.me/apps"><img src="https://img.shields.io/badge/🧩%207K%20App%20Store-Explore-111827?style=for-the-badge" alt="App Store"/></a>
   <a href="https://www.7kc.me/portfolio"><img src="https://img.shields.io/badge/🎨%20Portfolio%20Variations-Try%20All-111827?style=for-the-badge" alt="Portfolio Variations"/></a>
-  <a href="https://kunu2009.github.io/kunu2009/interactive/"><img src="https://img.shields.io/badge/🐾%20Interactive%20Zone-In%20Progress-111827?style=for-the-badge" alt="Interactive Zone"/></a>
+  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html"><img src="https://img.shields.io/badge/🐾%20Interactive%20Zone-View%20Now-111827?style=for-the-badge" alt="Interactive Zone"/></a>
 </div>
 
 ---
