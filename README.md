@@ -56,6 +56,7 @@ So here’s the best setup:
 - launch a **live interactive page** from README,
 - preload different moods via URL hash,
 - keep this section as the quick control hub.
+- the live demo also includes a **text-weave** scene where the cat drifts through flowing copy and the paragraph reflows around it.
 
 <div align="center">
   <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/kunu2009/kunu2009/main/interactive/index.html#play"><img src="https://img.shields.io/badge/🎾%20Play%20Mode-Throw%20Toy-7b61ff?style=for-the-badge" alt="Play mode"/></a>

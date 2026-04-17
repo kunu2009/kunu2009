@@ -59,6 +59,13 @@ body {
     z-index: 4;
 }
 
+.topbar,
+.cat-tip,
+.card {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, filter 0.18s ease;
+    will-change: transform;
+}
+
 .topbar {
     max-width: 1180px;
     margin: 0 auto 1rem;
@@ -119,11 +126,53 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border-radius: 18px;
     box-shadow: var(--shadow);
+    transform-origin: center center;
 }
 
 .hero {
     grid-row: span 2;
     padding: clamp(1.3rem, 2vw, 2rem);
+}
+
+.text-weave {
+    margin-top: 1rem;
+    border: 1px solid rgba(165, 180, 255, 0.28);
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(15, 22, 48, 0.85), rgba(10, 15, 33, 0.92));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.text-weave-header {
+    padding: 0.95rem 0.95rem 0.35rem;
+}
+
+.text-weave-kicker {
+    margin: 0 0 0.35rem;
+    color: #9fb0ff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.text-weave h2 {
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+.text-weave-note {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+#weave-canvas {
+    display: block;
+    width: 100%;
+    height: 214px;
+    pointer-events: none;
 }
 
 .badge {
@@ -347,6 +396,10 @@ h2 {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .text-weave h2 {
+        font-size: 1rem;
+    }
+
     .cat-tip {
         text-align: left;
     }
@@ -376,5 +429,9 @@ h2 {
 
     .metrics {
         grid-template-columns: 1fr;
+    }
+
+    #weave-canvas {
+        height: 238px;
     }
 }
